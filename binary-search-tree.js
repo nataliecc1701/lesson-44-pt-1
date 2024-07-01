@@ -146,36 +146,31 @@ class BinarySearchTree {
   /** dfsPreOrder(): Traverse the array using pre-order DFS.
    * Return an array of visited nodes. */
 
-  dfsPreOrder() {
-    const nodes = []
-    const branch = [this.root]
+  dfsPreOrder(node=this.root) {
+    const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
+    const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
     
-    while (branch) {
-      // follow as many left branches as we can
-      while (branch[branch.length-1].left) {
-        branch.push(branch[branch.length-1].left)
-      }
-      // now we're at something with no left branch
-      nodes.push(branch.pop())
-      // now we check the right-hand side
-      if (nodes[nodes.length-1].right) {
-        branch.push(nodes[nodes.length-1].right)
-      }
-    }
-    return nodes;
+    return [node, ...leftNodes, ...rightNodes]
   }
 
   /** dfsInOrder(): Traverse the array using in-order DFS.
    * Return an array of visited nodes. */
 
-  dfsInOrder() {
-
+  dfsInOrder(node=this.root) {
+    const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
+    const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
+    
+    return [...leftNodes, node, ...rightNodes]
   }
 
   /** dfsPostOrder(): Traverse the array using post-order DFS.
    * Return an array of visited nodes. */
 
-  dfsPostOrder() {
+  dfsPostOrder(node=this.root) {
+    const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
+    const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
+    
+    return [...leftNodes, ...rightNodes, node]
 
   }
 
@@ -183,6 +178,16 @@ class BinarySearchTree {
    * Return an array of visited nodes. */
 
   bfs() {
+    const nodes = [this.root];
+    let i = 0;
+    
+    while (i < nodes.length) {
+      if (nodes[i].left) nodes.push(nodes[i].left);
+      if (nodes[i].right) nodes.push(nodes[i].right);
+      i++;
+    }
+    
+    return nodes;
 
   }
 
