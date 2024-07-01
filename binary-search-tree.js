@@ -150,27 +150,27 @@ class BinarySearchTree {
     const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
     const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
     
-    return [node, ...leftNodes, ...rightNodes]
+    return [node, ...leftNodes, ...rightNodes].map(n => n.val)
   }
 
   /** dfsInOrder(): Traverse the array using in-order DFS.
    * Return an array of visited nodes. */
 
   dfsInOrder(node=this.root) {
-    const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
-    const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
+    const leftNodes = (node.left) ? this.dfsInOrder(node.left) : [];
+    const rightNodes = (node.right) ? this.dfsInOrder(node.right) : [];
     
-    return [...leftNodes, node, ...rightNodes]
+    return [...leftNodes, node, ...rightNodes].map(n => n.val)
   }
 
   /** dfsPostOrder(): Traverse the array using post-order DFS.
    * Return an array of visited nodes. */
 
   dfsPostOrder(node=this.root) {
-    const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
-    const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
+    const leftNodes = (node.left) ? this.dfsPostOrder(node.left) : [];
+    const rightNodes = (node.right) ? this.dfsPostOrder(node.right) : [];
     
-    return [...leftNodes, ...rightNodes, node]
+    return [...leftNodes, ...rightNodes, node].map(n => n.val)
 
   }
 
@@ -187,8 +187,22 @@ class BinarySearchTree {
       i++;
     }
     
-    return nodes;
+    return nodes.map(n => n.val);
 
+  }
+  
+  /** helper function for remove
+   * insertAllRecursively(vals, node):
+   * calls insertRecursively for all values in array vals
+   * starting at node
+   * in random order
+   */
+  
+  insertAllRecursively(vals, node=this.root) {
+    while(vals.length > 0) {
+      let i = Math.floor(Math.random()*vals.length);
+      this.insertRecursively(vals.splice(i,1)[0], node);
+    }
   }
 
   /** Further Study!
@@ -196,6 +210,63 @@ class BinarySearchTree {
    * Returns the removed node. */
 
   remove(val) {
+    let parent = null;
+    let currNode = this.root;
+    
+    while(currNode.val !== val) {
+      if (currNode.val > this.val) {
+        if (currNode.left) {
+          parent = currNode;
+          currNode = currNode.left;
+        }
+        else return undefined;
+      }
+      else if (currNode.val < this.val) {
+        if (currNode.right) {
+          parent = currNode;
+          currNode = currNode.right;
+        }
+        else return undefined;
+      }
+      else {
+        // incomparable
+        throw new Error ("val is incomparable to elements in tree")
+      }
+    }
+    const children = [currNode.left, currNode.right]
+    if (children.length === 0) {
+      if (parent) {
+        if (parent.left === currNode) parent.left = null;
+        if (parent.right === currNode) parent.right = null;
+      }
+      else {
+        this.root = null;
+      }
+    }
+    else if (children.length === 1) {
+      if (parent) {
+        if (parent.left === currNode) parent.left = children[0];
+        if (parent.right === currNode) parent.right = children[0];
+      }
+    }
+    else {
+      // two children
+      // this doesn't actually shuffle the nodes around neatly it just scoops them all
+      // up and re-inserts them (inefficient)
+      const descendants = this.dfsPreOrder(currNode).map(n => n.val);
+      descendants.unshift() // remove currNode
+      if (parent) {
+        if (parent.left === currNode) parent.left = null;
+        else parent.right = null;
+        
+        this.insertAllRecursively(descendants, parent);
+      }
+      else {
+        this.root = null;
+        this.insertAllRecursively(descendants);
+      }
+      
+    }
 
   }
 
