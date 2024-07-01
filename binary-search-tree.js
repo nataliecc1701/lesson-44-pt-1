@@ -109,14 +109,14 @@ class BinarySearchTree {
         if (currNode.right) {
           currNode = currNode.right;
         }
-        else return undefined
+        else return undefined;
       }
       else {
         // incomparable
         throw new Error("Value to find is incomparable to values in tree")
       }
     }
-    if (currNode.val === this.val) {
+    if (currNode.val === val) {
       return currNode;
     }
   }
@@ -144,33 +144,42 @@ class BinarySearchTree {
   }
 
   /** dfsPreOrder(): Traverse the array using pre-order DFS.
-   * Return an array of visited nodes. */
+   * Return an array of values (per test cases). */
 
   dfsPreOrder(node=this.root) {
     const leftNodes = (node.left) ? this.dfsPreOrder(node.left) : [];
     const rightNodes = (node.right) ? this.dfsPreOrder(node.right) : [];
     
-    return [node, ...leftNodes, ...rightNodes].map(n => n.val)
+    return [node, ...leftNodes, ...rightNodes].map(n => {
+      if (n instanceof Node) return n.val;
+      else return n;
+    })
   }
 
   /** dfsInOrder(): Traverse the array using in-order DFS.
-   * Return an array of visited nodes. */
+   * Return an array of values (per test cases). */
 
   dfsInOrder(node=this.root) {
     const leftNodes = (node.left) ? this.dfsInOrder(node.left) : [];
     const rightNodes = (node.right) ? this.dfsInOrder(node.right) : [];
     
-    return [...leftNodes, node, ...rightNodes].map(n => n.val)
+    return [...leftNodes, node, ...rightNodes].map(n => {
+      if (n instanceof Node) return n.val;
+      else return n;
+    })
   }
 
   /** dfsPostOrder(): Traverse the array using post-order DFS.
-   * Return an array of visited nodes. */
+   * Return an array of values (per test cases). */
 
   dfsPostOrder(node=this.root) {
     const leftNodes = (node.left) ? this.dfsPostOrder(node.left) : [];
     const rightNodes = (node.right) ? this.dfsPostOrder(node.right) : [];
     
-    return [...leftNodes, ...rightNodes, node].map(n => n.val)
+    return [...leftNodes, ...rightNodes, node].map(n => {
+      if (n instanceof Node) return n.val;
+      else return n;
+    })
 
   }
 
@@ -207,21 +216,25 @@ class BinarySearchTree {
 
   /** Further Study!
    * remove(val): Removes a node in the BST with the value val.
-   * Returns the removed node. */
+   * Returns the removed node. 
+   * 
+   * Turned-in version doesn't pass the test cases for removing nodes with two values
+   * because it rebuilds the tree under them in random insertion order */
 
   remove(val) {
     let parent = null;
     let currNode = this.root;
     
     while(currNode.val !== val) {
-      if (currNode.val > this.val) {
+      // console.log(`${currNode.val} !== ${val}`)
+      if (currNode.val > val) {
         if (currNode.left) {
           parent = currNode;
           currNode = currNode.left;
         }
         else return undefined;
       }
-      else if (currNode.val < this.val) {
+      else if (currNode.val < val) {
         if (currNode.right) {
           parent = currNode;
           currNode = currNode.right;
@@ -233,7 +246,12 @@ class BinarySearchTree {
         throw new Error ("val is incomparable to elements in tree")
       }
     }
-    const children = [currNode.left, currNode.right]
+    // console.log(`currNode: ${currNode.val} should === ${val}`)
+    // console.log(`parent node: ${parent.val}, left: ${parent.left}, right: ${parent.right}`)
+    const children = []
+    if (currNode.left) children.push(currNode.left);
+    if (currNode.right) children.push(currNode.right);
+    // console.log(`children: ${children}`)
     if (children.length === 0) {
       if (parent) {
         if (parent.left === currNode) parent.left = null;
@@ -253,7 +271,7 @@ class BinarySearchTree {
       // two children
       // this doesn't actually shuffle the nodes around neatly it just scoops them all
       // up and re-inserts them (inefficient)
-      const descendants = this.dfsPreOrder(currNode).map(n => n.val);
+      const descendants = this.dfsPreOrder(currNode);
       descendants.unshift() // remove currNode
       if (parent) {
         if (parent.left === currNode) parent.left = null;
